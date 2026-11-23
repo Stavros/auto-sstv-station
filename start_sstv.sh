@@ -24,3 +24,4 @@ sleep 3
 gpredict &
 sleep 2
 python3 -u "$HOME/sat_tracker.py" > "$HOME/sat_tracker.log" 2>&1 &
+python3 -u "$HOME/web_ui.py" > "$HOME/web_ui.log" 2>&1 &
