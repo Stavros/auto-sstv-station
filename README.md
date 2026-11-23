@@ -58,7 +58,7 @@ flowchart TB
 
 | Graphical Setup Wizard (`python3 setup.py`) | Terminal CLI Wizard (`python3 setup.py --cli`) |
 | :---: | :---: |
-| ![GUI Setup Wizard](assets/setup_gui.png) | ![CLI Setup Wizard](assets/setup_cli.png) |
+| ![GUI Setup Wizard](assets/setup_gui.png?v=2) | ![CLI Setup Wizard](assets/setup_cli.png) |
 
 ## Live Web Dashboard (`http://localhost:8080`)
 
