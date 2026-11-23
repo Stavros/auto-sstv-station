@@ -80,7 +80,7 @@ def format_device_string(sdr_type, dev_id):
             return tmpl.format(id=dev_id)
     return dev_id
 
-def write_station_files(sdrs, lat, lon, alt, min_elev, webhook, callsign='', satnogs_token='', satnogs_id=''):
+def write_station_files(sdrs, lat, lon, alt, min_elev, webhook, callsign='', satnogs_token='', satnogs_id='', aprs_fallback=True, aprs_pass=''):
     home = os.path.expanduser("~")
     cfg_path = os.path.join(home, "config.py")
     start_path = os.path.join(home, "start_sstv.sh")
@@ -118,6 +118,13 @@ def write_station_files(sdrs, lat, lon, alt, min_elev, webhook, callsign='', sat
                 txt = re.sub(r'device="[^"]*"', f'device="{s["device_str"]}"', txt)
             with open(conf_file, "w") as cf:
                 cf.write(txt)
+    if aprs_fallback:
+        with open(os.path.join(home, "direwolf.conf"), "w") as df:
+            df.write("ADEVICE pulse sstv_sink.monitor null\nACHANNELS 1\nCHANNEL 0\nMODEM 1200\n")
+            cs = callsign.strip().upper() or "N0CALL"
+            df.write(f"MYCALL {cs}-10\n")
+            if callsign.strip() and aprs_pass.strip():
+                df.write(f"IGSERVER euro.aprs2.net\nIGLOGIN {cs}-10 {aprs_pass.strip()}\n")
     with open(start_path, "w") as sf:
         sf.write("#!/bin/bash\nsleep 10\n\n")
         for s in sdrs:
@@ -200,7 +207,10 @@ def run_cli():
     callsign = input("Optional Amateur Radio Callsign (e.g. SV2HZK) [Leave blank to skip]: ").strip().upper()
     satnogs_id = input("Optional SatNOGS Ground Station ID [Leave blank to skip]: ").strip()
     satnogs_token = input("Optional SatNOGS API Token [Leave blank to skip]: ").strip()
-    write_station_files(sdrs, lat, lon, alt, min_elev, webhook, callsign, satnogs_token, satnogs_id)
+    aprs_in = input("Enable 145.825 MHz APRS Packet Fallback between SSTV passes? [Y/n]: ").strip().lower()
+    aprs_fallback = (aprs_in != "n")
+    aprs_pass = input("Optional APRS-IS Passcode for iGate upload [Leave blank for local log only]: ").strip() if aprs_fallback else ""
+    write_station_files(sdrs, lat, lon, alt, min_elev, webhook, callsign, satnogs_token, satnogs_id, aprs_fallback, aprs_pass)
     print("\nSaved ~/config.py, ~/.config/gqrx/sdr_*.conf, and ~/start_sstv.sh!")
 
 def run_gui():
@@ -283,6 +293,13 @@ def run_gui():
     sr2.pack(fill="x", pady=(6, 2))
     tk.Label(sr2, text="SatNOGS API Token:").pack(side="left")
     tk.Entry(sr2, textvariable=sn_tok_var, width=48, show="*").pack(side="left", padx=4, fill="x", expand=True)
+    aprs_var = tk.BooleanVar(value=True)
+    aprs_pass_var = tk.StringVar()
+    sr3 = tk.Frame(sn_frame)
+    sr3.pack(fill="x", pady=(6, 2))
+    tk.Checkbutton(sr3, text="145.825 MHz APRS Fallback", variable=aprs_var).pack(side="left")
+    tk.Label(sr3, text="APRS-IS Passcode (Opt):").pack(side="left", padx=(10, 0))
+    tk.Entry(sr3, textvariable=aprs_pass_var, width=10, show="*").pack(side="left", padx=4)
     def on_save():
         band_map = {
             "2m VHF (144-146 MHz)": [(144000000, 146000000)],
@@ -306,7 +323,7 @@ def run_gui():
                 "ranges": band_map[label],
                 "label": label,
             })
-        write_station_files(sdrs, lat_var.get().strip() or None, lon_var.get().strip() or None, alt_var.get().strip() or "0", elev_var.get().strip() or "5.0", wh_var.get(), cs_var.get(), sn_tok_var.get(), sn_id_var.get())
+        write_station_files(sdrs, lat_var.get().strip() or None, lon_var.get().strip() or None, alt_var.get().strip() or "0", elev_var.get().strip() or "5.0", wh_var.get(), cs_var.get(), sn_tok_var.get(), sn_id_var.get(), aprs_var.get(), aprs_pass_var.get())
         messagebox.showinfo("Saved", "Station configuration saved to ~/config.py, ~/.config/gqrx/sdr_.conf, and ~/start_sstv.sh!")
         root.destroy()
     tk.Button(root, text="Save Station Configuration", command=on_save, bg="#2f855a", fg="white", font=("Sans", 10, "bold"), padx=14, pady=6).pack(pady=12)
