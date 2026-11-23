@@ -131,6 +131,7 @@ The wizard generates three local files:
 
 - `setup.py` — Interactive Tkinter GUI & CLI station configurator.
 - `sat_tracker.py` — Multi-SDR SGP4 pass scheduler, Doppler controller, SatNOGS/CelesTrak fetcher, and Discord uploader.
+- `web_ui.py` — Zero-dependency HTTP web dashboard (`http://localhost:8080`) for live tracker logs and decoded SSTV image viewing.
 - `config.example.py` — Reference template showing available local configuration variables.
 
 ## License & Credits
