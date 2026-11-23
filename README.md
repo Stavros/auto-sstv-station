@@ -54,12 +54,6 @@ flowchart TB
     WATCH -->|Webhook Upload + Metadata| DISC[(Discord Channel)]
 ```
 
-## Screenshots
-
-| Live 24/7 Station | Interactive Multi-SDR Setup Wizard |
-| :---: | :---: |
-| ![Live Station](assets/station_desktop.png) | ![Setup Wizard](assets/setup_wizard.png) |
-
 ## Setup Wizard Screenshots (GUI & CLI)
 
 | Graphical Setup Wizard (`python3 setup.py`) | Terminal CLI Wizard (`python3 setup.py --cli`) |
