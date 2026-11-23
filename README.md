@@ -25,33 +25,31 @@ flowchart LR
 
 ### 2. 24/7 Automated Runtime & Multi-SDR Pipeline
 ```mermaid
-flowchart TB
-    subgraph Orbital["Orbital & Catalog Engine (sat_tracker.py)"]
-        direction LR
-        TLE[Gpredict Cache / CelesTrak TLEs] --> SGP4[1 Hz SGP4 LoS & Doppler Solver]
-        CAT[Core Sats + SatNOGS DB API] --> SGP4
+flowchart TD
+    subgraph Init["1. Initialization & Hybrid Discovery (setup.py / sat_tracker.py)"]
+        A["setup.py (GUI / CLI)"] -->|Generates| B["~/config.py & ~/direwolf.conf"]
+        C["SatNOGS DB API (Active 2m/70cm SSTV)"] -->|Auto-Discovery| D["sat_tracker.py (SGP4 Engine)"]
+        E["Gpredict .sat / CelesTrak TLEs"] --> D
+        B --> D
     end
 
-    subgraph SDR0["Receiver Pipeline #0 (e.g. 2m VHF)"]
-        direction LR
-        HW0[SDR #0 Antenna] --> GQRX0[GQRX #0<br/>TCP :7356]
-        GQRX0 -->|FM Demod Audio| PW0[PipeWire Null Sink<br/>sstv_sink_0]
-        PW0 --> QSSTV0[QSSTV #0<br/>Auto-Decode & Save]
+    subgraph Runtime["2. Dual-Mode 24/7 Runtime Pipeline"]
+        D -->|Pass > Min Elev: 1 Hz Doppler| F["GQRX SDR DSP (TCP :7356)"]
+        D -->|Idle Standby: 145.825 MHz| F
+        F -->|Audio Stream| G["PipeWire Virtual Sink (sstv_sink)"]
+        G -->|Monitor Audio| H["QSSTV Auto-RX Decoder"]
+        G -->|Monitor Audio| I["Direwolf AX.25 TNC (APRS)"]
+        H -->|Decoded PNG/JPG| J["~/qsstv/rx_sstv/"]
+        I -->|Decoded Packets| K["~/aprs_packets.log"]
     end
 
-    subgraph SDR1["Receiver Pipeline #N (Optional, e.g. 70cm UHF)"]
-        direction LR
-        HW1[SDR #N Antenna] --> GQRX1[GQRX #N<br/>TCP :7356+N]
-        GQRX1 -->|FM Demod Audio| PW1[PipeWire Null Sink<br/>sstv_sink_N]
-        PW1 --> QSSTV1[QSSTV #N<br/>Auto-Decode & Save]
+    subgraph Outputs["3. Monitoring & Optional Network Uploads"]
+        J --> L["web_ui.py (http://localhost:8080)"]
+        K --> L
+        D -->|24h Pass Predictions| L
+        J -->|Optional Alert| M["Discord Webhook"]
+        J -->|Optional Telemetry & Frame| N["SatNOGS Network API"]
     end
-
-    SGP4 -->|"F &lt;Doppler Hz&gt; (TCP)"| GQRX0
-    SGP4 -->|"F &lt;Doppler Hz&gt; (TCP)"| GQRX1
-
-    QSSTV0 -->|New PNG/JPG| WATCH[File Watcher & Discord Notifier]
-    QSSTV1 -->|New PNG/JPG| WATCH
-    WATCH -->|Webhook Upload + Metadata| DISC[(Discord Channel)]
 ```
 
 ## Setup Wizard Screenshots (GUI & CLI)
