@@ -60,6 +60,10 @@ flowchart TB
 | :---: | :---: |
 | ![GUI Setup Wizard](assets/setup_gui.png) | ![CLI Setup Wizard](assets/setup_cli.png) |
 
+## Live Web Dashboard (`http://localhost:8080`)
+
+![Live Web Dashboard](assets/web_dashboard.png)
+
 ## Key Features
 
 - **Interactive Setup Wizard (`setup.py`):** Launches a Tkinter GUI on desktop/VNC or falls back automatically to an interactive terminal CLI (`--cli`) over SSH.
