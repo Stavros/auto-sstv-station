@@ -120,7 +120,7 @@ def write_station_files(sdrs, lat, lon, alt, min_elev, webhook, callsign='', sat
                 cf.write(txt)
     if aprs_fallback:
         with open(os.path.join(home, "direwolf.conf"), "w") as df:
-            df.write("ADEVICE pulse sstv_sink.monitor null\nACHANNELS 1\nCHANNEL 0\nMODEM 1200\n")
+            df.write("ADEVICE pulse null\nACHANNELS 1\nCHANNEL 0\nMODEM 1200\n")
             cs = callsign.strip().upper() or "N0CALL"
             df.write(f"MYCALL {cs}-10\n")
             if callsign.strip() and aprs_pass.strip():
