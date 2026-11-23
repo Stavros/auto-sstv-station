@@ -80,7 +80,7 @@ def format_device_string(sdr_type, dev_id):
             return tmpl.format(id=dev_id)
     return dev_id
 
-def write_station_files(sdrs, lat, lon, alt, min_elev, webhook):
+def write_station_files(sdrs, lat, lon, alt, min_elev, webhook, callsign='', satnogs_token='', satnogs_id=''):
     home = os.path.expanduser("~")
     cfg_path = os.path.join(home, "config.py")
     start_path = os.path.join(home, "start_sstv.sh")
@@ -197,7 +197,10 @@ def run_cli():
     alt = input("Altitude in meters: ").strip() or "0"
     min_elev = input("Minimum horizon elevation in degrees [5.0]: ").strip() or "5.0"
     webhook = input("\nOptional Discord Webhook URL [Leave blank to skip]: ").strip()
-    write_station_files(sdrs, lat, lon, alt, min_elev, webhook)
+    callsign = input("Optional Amateur Radio Callsign (e.g. SV2HZK) [Leave blank to skip]: ").strip().upper()
+    satnogs_id = input("Optional SatNOGS Ground Station ID [Leave blank to skip]: ").strip()
+    satnogs_token = input("Optional SatNOGS API Token [Leave blank to skip]: ").strip()
+    write_station_files(sdrs, lat, lon, alt, min_elev, webhook, callsign, satnogs_token, satnogs_id)
     print("\nSaved ~/config.py, ~/.config/gqrx/sdr_*.conf, and ~/start_sstv.sh!")
 
 def run_gui():
@@ -268,6 +271,18 @@ def run_gui():
     sn_tok_var = tk.StringVar()
     sn_id_var = tk.StringVar()
     tk.Entry(wh_frame, textvariable=wh_var, width=68).pack(fill="x")
+    sn_frame = tk.LabelFrame(root, text="Optional SatNOGS Network & Callsign", padx=10, pady=8)
+    sn_frame.pack(fill="x", **pad)
+    sr1 = tk.Frame(sn_frame)
+    sr1.pack(fill="x", pady=2)
+    tk.Label(sr1, text="Callsign:").pack(side="left")
+    tk.Entry(sr1, textvariable=cs_var, width=12).pack(side="left", padx=4)
+    tk.Label(sr1, text="SatNOGS Station ID:").pack(side="left", padx=(10, 0))
+    tk.Entry(sr1, textvariable=sn_id_var, width=10).pack(side="left", padx=4)
+    sr2 = tk.Frame(sn_frame)
+    sr2.pack(fill="x", pady=(6, 2))
+    tk.Label(sr2, text="SatNOGS API Token:").pack(side="left")
+    tk.Entry(sr2, textvariable=sn_tok_var, width=48, show="*").pack(side="left", padx=4, fill="x", expand=True)
     def on_save():
         band_map = {
             "2m VHF (144-146 MHz)": [(144000000, 146000000)],
@@ -291,7 +306,7 @@ def run_gui():
                 "ranges": band_map[label],
                 "label": label,
             })
-        write_station_files(sdrs, lat_var.get().strip() or None, lon_var.get().strip() or None, alt_var.get().strip() or "0", elev_var.get().strip() or "5.0", wh_var.get())
+        write_station_files(sdrs, lat_var.get().strip() or None, lon_var.get().strip() or None, alt_var.get().strip() or "0", elev_var.get().strip() or "5.0", wh_var.get(), cs_var.get(), sn_tok_var.get(), sn_id_var.get())
         messagebox.showinfo("Saved", "Station configuration saved to ~/config.py, ~/.config/gqrx/sdr_.conf, and ~/start_sstv.sh!")
         root.destroy()
     tk.Button(root, text="Save Station Configuration", command=on_save, bg="#2f855a", fg="white", font=("Sans", 10, "bold"), padx=14, pady=6).pack(pady=12)
