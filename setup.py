@@ -264,6 +264,9 @@ def run_gui():
     wh_frame = tk.LabelFrame(root, text="Optional Discord Webhook Alerts", padx=10, pady=8)
     wh_frame.pack(fill="x", **pad)
     wh_var = tk.StringVar()
+    cs_var = tk.StringVar()
+    sn_tok_var = tk.StringVar()
+    sn_id_var = tk.StringVar()
     tk.Entry(wh_frame, textvariable=wh_var, width=68).pack(fill="x")
     def on_save():
         band_map = {

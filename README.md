@@ -72,6 +72,7 @@ flowchart TB
 - **Real-Time Doppler Correction:** Tunes GQRX every second via TCP Rigctl (`F <Hz>`) whenever a target rises above your minimum horizon elevation (`5.0°` default).
 - **Power-Outage Resilience:** `start_sstv.sh` clears GQRX crash flags (`crashed=false`), rebuilds virtual audio cables, and starts the DSP waterfall (`U DSP 1`) automatically on boot.
 - **Local Web Dashboard (`web_ui.py`):** Zero-dependency HTTP dashboard (`http://localhost:8080` or `http://<pi-ip>:8080`) showing live SGP4 tracker logs and a decoded SSTV image gallery.
+- **Optional SatNOGS Network Integration:** Optionally register your callsign, SatNOGS Station ID, and API token in `setup.py` to automatically log receptions.
 - **Optional Discord Image Alerts:** Monitors QSSTV output folders and uploads newly decoded frames to a Discord webhook with satellite name, elevation, and frequency metadata.
 
 ## Supported SDR Hardware

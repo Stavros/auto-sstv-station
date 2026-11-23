@@ -16,3 +16,8 @@ SATS = {}
 # QSSTV received images directory & optional Discord Webhook URL
 RX_DIR = '/home/pi/qsstv/rx_sstv'
 DISCORD_WEBHOOK = ""
+
+# Optional SatNOGS Network Upload & Station Telemetry
+CALLSIGN = ""
+SATNOGS_API_TOKEN = ""
+SATNOGS_STATION_ID = ""
